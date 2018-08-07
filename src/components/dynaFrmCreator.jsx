@@ -12,14 +12,14 @@ class DynaFrmCreator extends Component {
                     fields : [{
                         name : '',
                         caption : '',
-                        type : '',
+                        type : 'text',
                         params : []
                     }]
                 },
             currentFieldIndex : 0,
             modal: false,
-            params : []
-
+            params : [],
+            saved : false
         }
 
         this.addField = this.addField.bind(this)
@@ -28,7 +28,6 @@ class DynaFrmCreator extends Component {
         this.toggle = this.toggle.bind(this)
         this.addParamRow=this.addParamRow.bind(this)
         this.deleteParamRow = this.deleteParamRow.bind(this)
-        this.handleParamsSave = this.handleParamsSave.bind(this)
     }
 
     addParams(index) {
@@ -37,6 +36,13 @@ class DynaFrmCreator extends Component {
             params : field[0].params,
             currentFieldIndex : index
         },()=>this.toggle())
+    }
+
+    cancel() {
+        this.setState({
+            params : [],
+            modal : false
+        })
     }
 
     addParamRow() {
@@ -65,7 +71,7 @@ class DynaFrmCreator extends Component {
             name : '',
             caption : '',
             type : '',
-            params : [{}]
+            params : []
         })
         this.setState({
             form : {
@@ -125,9 +131,10 @@ class DynaFrmCreator extends Component {
         })
 
     }
-    handleParamsSave(index) {
+    handleParamsSave(e) {
+        e.preventDefault()
         let fields = this.state.form.fields
-        console.log('فیلدهای',index)
+        let index = this.state.currentFieldIndex
         fields[index].params = this.state.params
         this.setState({
             form : {
@@ -138,9 +145,17 @@ class DynaFrmCreator extends Component {
         })
     }
 
+    onSubmit(e) {
+        e.preventDefault()
+        this.setState({
+            saved : true
+        })
+    }
+
     render() {
         return(
             <div>
+                <form onSubmit={(e)=>this.onSubmit(e)}>
                 <Table>
                     <thead>
                         <th>#</th>
@@ -154,16 +169,15 @@ class DynaFrmCreator extends Component {
                         this.state.form.fields.map((field,index)=>{
                             return  <tr key={index}>
                                 <td>{index+1}</td>
-                                <td><Input type="text" name="name" onChange={this.handleChange.bind(this,index)} value={this.state.form.fields[index].name}/></td>
-                                <td><Input type="text" name="caption" onChange={this.handleChange.bind(this,index)} value={this.state.form.fields[index].caption}/></td>
+                                <td><Input required type="text" name="name" onChange={this.handleChange.bind(this,index)} value={this.state.form.fields[index].name}/></td>
+                                <td><Input required type="text" name="caption" onChange={this.handleChange.bind(this,index)} value={this.state.form.fields[index].caption}/></td>
                                 <td>
                                     <Input type="select" name="type" onChange={this.handleChange.bind(this,index)} value={this.state.form.fields[index].type}>
-                                        <option value="text">TEXT</option>
-                                        <option value="email">EMAIL</option>
-                                        <option value="check">CheckBox</option>
-                                        <option value="check">Radio</option>
+                                        <option value="text">STRING</option>
+                                        <option value="textarea">TEXT</option>
+                                        <option value="text">Number</option>
+                                        <option value="file">File</option>
                                         <option value="select">SELECT</option>
-                                        <option value="file">FILE</option>
                                     </Input>
                                 </td>
                                 <td>
@@ -178,10 +192,12 @@ class DynaFrmCreator extends Component {
                     </tbody>
                     <tfoot>
                         <Button color="sucess" onClick={this.addField}>Add</Button>
+                        <Button color="secondary" type="submit">Save</Button>
                     </tfoot>
                 </Table>
-
+                </form>
                 <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
+                <form onSubmit={(e)=>this.handleParamsSave(e)}>
                 <ModalHeader toggle={this.toggle}>افزودن مقادیر</ModalHeader>
                 <ModalBody>
                     <Table>
@@ -197,8 +213,8 @@ class DynaFrmCreator extends Component {
                                 this.state.params.map((param,index)=>{
                                     return  <tr key={index}>
                                                 <td>{index+1}</td>
-                                                <td><Input type="text" value={this.state.params[index].caption} name="caption" onChange={this.handleParamChange.bind(this,index)}/></td>
-                                                <td><Input type="text" value={this.state.params[index].value} name="value" onChange={this.handleParamChange.bind(this,index)}/></td>
+                                                <td><Input required type="text" value={this.state.params[index].caption} name="caption" onChange={this.handleParamChange.bind(this,index)}/></td>
+                                                <td><Input required type="text" value={this.state.params[index].value} name="value" onChange={this.handleParamChange.bind(this,index)}/></td>
                                                 <td><Button color="danger" onClick={this.deleteParamRow.bind(this,index)}>Delete</Button></td>
                                             </tr>   
                                 })
@@ -210,11 +226,14 @@ class DynaFrmCreator extends Component {
                     </Table>
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="primary" onClick={this.handleParamsSave.bind(this,this.state.currentFieldIndex)}>Do Something</Button>{' '}
-                    <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                    <Button color="primary" type="submit">Save</Button>
+                    <Button color="secondary" onClick={()=>this.cancel()}>Cancel</Button>
                 </ModalFooter>
+                </form>
                 </Modal>
-                
+
+                <pre align="left">{this.state.saved ? JSON.stringify(this.state.form,null, 2) : ""  }</pre>
+
             </div>
         )
     }
