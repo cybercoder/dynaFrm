@@ -1,1 +1,1 @@
-AKAF Dynamic REACT form builder
+Dynamic REACT form builder

@@ -16,6 +16,7 @@ class DynaFrmCreator extends Component {
                         params : []
                     }]
                 },
+            currentFieldIndex : 0,
             modal: false,
             params : []
 
@@ -27,19 +28,20 @@ class DynaFrmCreator extends Component {
         this.toggle = this.toggle.bind(this)
         this.addParamRow=this.addParamRow.bind(this)
         this.deleteParamRow = this.deleteParamRow.bind(this)
+        this.handleParamsSave = this.handleParamsSave.bind(this)
     }
 
     addParams(index) {
         let field = this.state.form.fields.filter((field,idx)=>idx===index)
-        console.log(field)
         this.setState({
-            params : field[0].params
+            params : field[0].params,
+            currentFieldIndex : index
         },()=>this.toggle())
     }
 
     addParamRow() {
         let params = this.state.params.slice()
-        params.push('')
+        params.push({})
         this.setState({
             params : params
         })
@@ -63,7 +65,7 @@ class DynaFrmCreator extends Component {
             name : '',
             caption : '',
             type : '',
-            params : []
+            params : [{}]
         })
         this.setState({
             form : {
@@ -114,12 +116,26 @@ class DynaFrmCreator extends Component {
         const name = target.name;
         
         let params = this.state.params
-        params[index] = value
+        params[index][name] = value
+        console.log(params[index])
+
 
         this.setState({
             params : params
         })
 
+    }
+    handleParamsSave(index) {
+        let fields = this.state.form.fields
+        console.log('فیلدهای',index)
+        fields[index].params = this.state.params
+        this.setState({
+            form : {
+                ...this.state.form,
+                fields : fields
+            },
+            modal: false
+        })
     }
 
     render() {
@@ -172,6 +188,7 @@ class DynaFrmCreator extends Component {
                         <thead>
                             <tr>
                                 <th>ردیف</th>
+                                <th>عنوان</th>
                                 <th>مقدار</th>
                             </tr>
                         </thead>
@@ -180,7 +197,8 @@ class DynaFrmCreator extends Component {
                                 this.state.params.map((param,index)=>{
                                     return  <tr key={index}>
                                                 <td>{index+1}</td>
-                                                <td><Input type="text" value={this.state.params[index]} name={index} onChange={this.handleParamChange.bind(this,index)}/></td>
+                                                <td><Input type="text" value={this.state.params[index].caption} name="caption" onChange={this.handleParamChange.bind(this,index)}/></td>
+                                                <td><Input type="text" value={this.state.params[index].value} name="value" onChange={this.handleParamChange.bind(this,index)}/></td>
                                                 <td><Button color="danger" onClick={this.deleteParamRow.bind(this,index)}>Delete</Button></td>
                                             </tr>   
                                 })
@@ -192,7 +210,7 @@ class DynaFrmCreator extends Component {
                     </Table>
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
+                    <Button color="primary" onClick={this.handleParamsSave.bind(this,this.state.currentFieldIndex)}>Do Something</Button>{' '}
                     <Button color="secondary" onClick={this.toggle}>Cancel</Button>
                 </ModalFooter>
                 </Modal>
