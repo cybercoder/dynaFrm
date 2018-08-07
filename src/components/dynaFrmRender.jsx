@@ -24,7 +24,7 @@ class DynaFrmRender extends Component {
                     
                         {
                             (m.type === "text") ?
-                                (<Input type={m.type} placeholder={m.caption} name="m.name"/>)
+                                (<Input type={m.type} placeholder={m.caption} name={m.name}/>)
                                 : (<div></div>)
 
                         }
@@ -41,6 +41,29 @@ class DynaFrmRender extends Component {
                                 </select>
                                 ) : (<div></div>)    
                         }
+                        {
+                            (m.type === "radio") ? (
+                                <div>
+                                <legend>{m.caption}</legend>
+                                {
+                                    m.params.map((param,index)=> {
+                                       return   <FormGroup check>
+                                                    <Label check>
+                                                    <Input type="radio" name={m.name} />
+                                                    {param.caption}
+                                                    </Label>
+                                                </FormGroup>
+                                    })
+                                }
+                                </div>
+                                ) : (<div></div>)    
+                        }
+                        {
+                            (m.type === "file") ?
+                                (<Input type={m.type} name={m.name}/>)
+                                : (<div></div>)
+
+                        }                      
                 </FormGroup>
             )
         })

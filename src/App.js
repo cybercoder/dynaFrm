@@ -26,6 +26,26 @@ class App extends Component {
                 value: "۲هفته"
               }
             ]
+          },
+          {
+            name: "hairColor",
+            caption : "آخرین ریشه رنگ",
+            type: "radio",
+            params: [
+              {
+                caption: "یک هفته",
+                value: "۱هفته"
+              },
+              {
+                caption: "دو هفته",
+                value: "۲هفته"
+              }
+            ]
+          },
+          {
+            name: "file1",
+            caption : "تصویر ارسالی شما",
+            type: "file",
           }
         ]
       }
