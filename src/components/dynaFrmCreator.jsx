@@ -97,8 +97,6 @@ class DynaFrmCreator extends Component {
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
 
-
-
         let fields = this.state.form.fields
 
         fields[index] = {

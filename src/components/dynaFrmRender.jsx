@@ -1,84 +1,122 @@
 import React, { Component } from 'react'
-import { Button,Table, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input } from 'reactstrap';
 
 class DynaFrmRender extends Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
+
+        let data = this.props.model.map(field=>{return {name : field.name, type: field.type, caption : field.caption, value : ""}})
 
         this.state = {
-        
+            data : data
         }
+    }
+
+    handleChange(e,index) {
+        let target = e.target
+        let value = target.type === 'checkbox' ? target.checked : target.value;
+        let data = this.state.data
+        data[index] = {
+            ...data[index],
+            value : value
+        }
+        this.setState({
+            data : data
+        })
+    }
+
+    onSubmit(e) {
+        e.preventDefault()
+        if (this.props.onSubmit) this.props.onSubmit(this.state.data)
     }
 
     renderForm() {
         let model = this.props.model
-        let FormUI = model.map(m=>{
+        let FormUI = model.map((m,index)=>{
             let name = m.name
             let caption = m.caption
             let type = m.type
             let params = m.params || []
 
             return(
-                <FormGroup key={name}>
-                    <label htmlFor={m.key}>{m.caption}</label>
-                    
+                    <div key={index}>
                         {
-                            (m.type === "text") ?
-                                (<Input type={m.type} placeholder={m.caption} name={m.name}/>)
+                            (type === "text" || type==="textarea" || type==="color" || type==="number" || type==="range") ?
+                                (
+                                <FormGroup key={name}> 
+                                    <label htmlFor={name}>{caption}</label>
+                                    <Input onChange={(e)=>this.handleChange(e,index)} value={this.state.data[index].value} id={name} type={type} placeholder={caption} name={name}/>
+                                </FormGroup>
+                                )
                                 : (<div></div>)
 
                         }
                         {
-                            (m.type === "select") ? (
-                                <select placeholder={m.caption} name={m.name}>
-                                {
-                                    m.params.map((param,index)=> {
-                                       return <option key={index} value={param.value}>
-                                            {param.caption}
-                                        </option>
-                                    })
-                                }
-                                </select>
+                            (type==="checkbox") ?
+                                (
+                                <FormGroup key={name} check>
+                                    <label>
+                                        <Input onChange={(e)=>this.handleChange(e,index)} value={this.state.data[index].value} type={type} name={name}/>{` ${caption}`}
+                                    </label>
+                                </FormGroup>
+                                )
+                                : (<div></div>)
+
+                        }                          
+                        {
+                            (type === "select") ? (
+                                <FormGroup>
+                                    <Label for={name}>{caption}</Label>
+                                    <select onChange={(e)=>this.handleChange(e,index)} value={this.state.data[index].value} name={name} id={name} className="form-control">
+                                    {
+                                        params.map((param,index)=> {
+                                        return <option key={index} value={param.value}>
+                                                {param.caption}
+                                            </option>
+                                        })
+                                    }
+                                    </select>
+                                </FormGroup>
                                 ) : (<div></div>)    
                         }
                         {
-                            (m.type === "radio") ? (
-                                <div>
-                                <legend>{m.caption}</legend>
+                            (type === "radio") ? (
+                                <FormGroup tag="fieldset">
+                                <legend>{caption}</legend>
+                                <div onChange={(e)=>this.handleChange(e,index)}>
                                 {
-                                    m.params.map((param,index)=> {
-                                       return   <FormGroup check>
+                                    params.map((param,index)=> {
+                                       return   <FormGroup key={index} check>
                                                     <Label check>
-                                                    <Input type="radio" name={m.name} />
+                                                    <Input type="radio" value={param.value} name={name} />
                                                     {param.caption}
                                                     </Label>
                                                 </FormGroup>
                                     })
                                 }
                                 </div>
+                                </FormGroup>
                                 ) : (<div></div>)    
                         }
                         {
-                            (m.type === "file") ?
-                                (<Input type={m.type} name={m.name}/>)
+                            (type === "file") ?
+                                (<Input type={type} onChange={(e)=>this.handleChange(e,index)} value={this.state.data[index].value} name={name}/>)
                                 : (<div></div>)
-
                         }                      
-                </FormGroup>
+                </div>
             )
         })
         return FormUI
     }
 
     render() {
-        let title = this.props.title || "Dynamic form"
+        let title = this.props.title || "فرم پویا"
         return(
             <div>
-                <pre align="left">{JSON.stringify(this.props.model,null, 2)}</pre>
-
                 <h3>{title}</h3>
-                <Form>
+                <Form onSubmit={(e)=>this.onSubmit(e)}>
                     {this.renderForm()}
+                    <Button color="secondary">ارسال و ذخیره</Button>
                 </Form>
             </div>
         )

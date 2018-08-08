@@ -13,6 +13,11 @@ class App extends Component {
         id: 1,
         fields: [
           {
+            name: "hairFile",
+            caption : "آخرین ریشه رنگ",
+            type: "file",
+          },          
+          {
             name: "hairColor",
             caption : "آخرین ریشه رنگ",
             type: "select",
@@ -28,7 +33,18 @@ class App extends Component {
             ]
           },
           {
-            name: "hairColor",
+            name: "hairColor1",
+            caption : "آخرین ریشه رنگ",
+            type: "checkbox",
+          },
+          {
+            name: "hairColor2",
+            caption : "آخرین ریشه رنگ",
+            type: "textarea",
+          },          
+
+          {
+            name: "hairColor3",
             caption : "آخرین ریشه رنگ",
             type: "radio",
             params: [
@@ -45,11 +61,24 @@ class App extends Component {
           {
             name: "file1",
             caption : "تصویر ارسالی شما",
-            type: "file",
-          }
+            type: "number",
+          },
+          {
+            name: "fxle1",
+            caption : "تصویر ارسالی شما",
+            type: "range",
+          },
+          {
+            name: "color1",
+            caption : "رنگ",
+            type: "color",
+          }          
         ]
       }
     }
+  }
+  onSubmit(model) {
+    alert(JSON.stringify(model,null,2))
   }
   render() {
     return (
@@ -57,11 +86,12 @@ class App extends Component {
 
         <DynaFrmRender
         model={this.state.form.fields}
+        onSubmit={(model)=>this.onSubmit(model)}
         />
 
-        <DynaFrmCreator
+        {/* <DynaFrmCreator
           id = "1"
-        />        
+        />         */}
       </div>
     );
   }
